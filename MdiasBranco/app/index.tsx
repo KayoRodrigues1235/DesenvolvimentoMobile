@@ -7,11 +7,12 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, Typography, Colors } from '@/constants/theme';
+import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import InputField from '@/components/InputField';
 import { router } from 'expo-router';
 
@@ -26,8 +27,12 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   
+  // Usando as cores do seu theme
   const primaryColor = useThemeColor({}, 'primary');
+  const secondaryColor = useThemeColor({}, 'secondary');
   const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const textLightColor = useThemeColor({}, 'textLight');
 
   const validateEmail = (emailInput: string): string => {
     const emailRegex = /^[^\s@]+@mdiasbranco\.com\.br$/;
@@ -52,17 +57,7 @@ export default function LoginScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(
-        'Acesso Permitido',
-        `Bem-vindo, funcionário da M. Dias Branco!\n\nEmail: ${email}`,
-        [{ 
-          text: 'OK', 
-          onPress: () => {
-            console.log('Login simulado - navegar para dashboard');
-            // router.replace('/dashboard');
-          } 
-        }]
-      );
+      router.replace('/src/tabs/home')
     }, 1500);
   };
 
@@ -72,12 +67,19 @@ export default function LoginScreen() {
       style={[styles.container, { backgroundColor }]}
     >
       <ThemedView style={styles.content}>
-        {/* Header */}
+        {/* Header com Banner */}
         <View style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
+          <View style={styles.bannerContainer}>
+            <Image
+              source={require('../assets/images/banner.png')}
+              style={styles.banner}
+              resizeMode="contain"
+            />
+          </View>
+          <ThemedText type="title" style={[styles.title, { color: primaryColor }]}>
             M. Dias Branco
           </ThemedText>
-          <ThemedText type="subtitle" style={[styles.subtitle, { color: primaryColor }]}>
+          <ThemedText type="subtitle" style={[styles.subtitle, { color: textLightColor }]}>
             Portal do Funcionário
           </ThemedText>
         </View>
@@ -124,7 +126,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.forgotButton}>
-            <ThemedText type="link" style={styles.forgotText}>
+            <ThemedText type="link" style={[styles.forgotText, { color: textLightColor }]}>
               Esqueci minha senha
             </ThemedText>
           </TouchableOpacity>
@@ -132,10 +134,10 @@ export default function LoginScreen() {
         
         {/* Footer */}
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>
+          <ThemedText style={[styles.footerText, { color: textLightColor }]}>
             Ambiente seguro para colaboradores
           </ThemedText>
-          <ThemedText style={styles.footerSubtext}>
+          <ThemedText style={[styles.footerSubtext, { color: textLightColor }]}>
             M. Dias Branco S.A.
           </ThemedText>
         </View>
@@ -158,22 +160,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.xl,
   },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: BorderRadius.round,
+  bannerContainer: {
+    width: 150,
+    height: 150,
+    marginBottom: Spacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
   },
-  logoIcon: {
-    fontSize: Typography.fontSize.display,
+  banner: {
+    width: '100%',
+    height: '100%',
   },
   title: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
     marginBottom: Spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.medium,
+    textAlign: 'center',
   },
   form: {
     marginVertical: Spacing.xl,
@@ -184,11 +191,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: Spacing.md,
+     backgroundColor: '#0a2d7a',
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: Typography.fontSize.md,
-    fontWeight: '600',
+    fontWeight: Typography.fontWeight.semibold,
   },
   forgotButton: {
     alignItems: 'center',

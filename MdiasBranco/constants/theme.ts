@@ -1,60 +1,115 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+ * Theme colors for M. Dias Branco App
+ * Minimalist color system
  */
 
 import { Platform } from 'react-native';
 
-// Novas cores da marca
-const tintColorLight = '#7B68EE';
-const tintColorDark = '#7B68EE';
+// ============================================
+// CORES PRINCIPAIS DA EMPRESA
+// ============================================
+const brandColors = {
+  // Fundo principal
+  background: '#03246b',      // Azul corporativo
+  
+  // Textos
+  text: '#dce5e7',            // Branco para textos
+  
+  // Variações para hierarquia (baseadas nas cores principais)
+  textLight: '#a8b9c4',       // Branco com opacidade para textos secundários
+  textLighter: '#7a919f',     // Branco mais opaco para textos terciários
+  
+  // Superfícies (variações do azul para cards, inputs, etc)
+  surface: '#0a2d7a',         // Azul um pouco mais claro para superfícies
+  surfaceDark: '#011a4a',     // Azul mais escuro para contraste
+  
+  // Bordas (variações para manter harmonia)
+  border: '#124192',          // Azul médio para bordas
+  borderDark: '#0a2d7a',      // Azul mais escuro para bordas
+  
+  // Cores de status (mantendo a paleta minimalista)
+  success: '#4ade80',         // Verde suave
+  error: '#f87171',           // Vermelho suave
+  warning: '#fbbf24',         // Amarelo suave
+  info: '#60a5fa',            // Azul claro
+};
 
+// ============================================
+// LIGHT MODE (único tema, sem variação)
+// ============================================
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#FFFAF0', 
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-
-    primary: '#7B68EE',            
-    secondary: '#9B8AF5',          
-    tertiary: '#5B4EC4',           
-    surface: '#FFFFFF',            
-    surfaceDark: '#F5F0E6',        
-    border: '#E5E0D6',            
-    borderDark: '#D4CFC5',
-    error: '#DC3545',
-    success: '#28A745',
-    warning: '#FFC107',
-    info: '#17A2B8',
-    textLight: '#6C757D',
-    textLighter: '#ADB5BD',
+    // Brand
+    background: brandColors.background,
+    surface: brandColors.surface,
+    surfaceDark: brandColors.surfaceDark,
+    
+    // Texts
+    text: brandColors.text,
+    textLight: brandColors.textLight,
+    textLighter: brandColors.textLighter,
+    textInverse: brandColors.background,
+    
+    // Borders
+    border: brandColors.border,
+    borderDark: brandColors.borderDark,
+    
+    // Status
+    success: brandColors.success,
+    error: brandColors.error,
+    warning: brandColors.warning,
+    info: brandColors.info,
+    
+    // Icons & Tab
+    icon: brandColors.textLight,
+    iconSelected: brandColors.text,
+    tabIconDefault: brandColors.textLight,
+    tabIconSelected: brandColors.text,
+    tint: brandColors.text,
+    
+    // Primary (usando o azul como cor principal)
+    primary: brandColors.text,
+    secondary: brandColors.textLight,
   },
+  // Dark mode igual ao light (pelo menos por enquanto)
   dark: {
-    text: '#ECEDEE',
-    background: '#1a1a2e',         
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-
-    primary: '#7B68EE',
-    secondary: '#9B8AF5',
-    tertiary: '#5B4EC4',
-    surface: '#2a2a3e',
-    surfaceDark: '#1a1a2e',
-    border: '#3a3a4e',
-    borderDark: '#4a4a5e',
-    error: '#FF453A',
-    success: '#32D74B',
-    warning: '#FF9F0A',
-    info: '#0A84FF',
-    textLight: '#8E8E93',
-    textLighter: '#636366',
+    // Brand
+    background: brandColors.background,
+    surface: brandColors.surface,
+    surfaceDark: brandColors.surfaceDark,
+    
+    // Texts
+    text: brandColors.text,
+    textLight: brandColors.textLight,
+    textLighter: brandColors.textLighter,
+    textInverse: brandColors.background,
+    
+    // Borders
+    border: brandColors.border,
+    borderDark: brandColors.borderDark,
+    
+    // Status
+    success: brandColors.success,
+    error: brandColors.error,
+    warning: brandColors.warning,
+    info: brandColors.info,
+    
+    // Icons & Tab
+    icon: brandColors.textLight,
+    iconSelected: brandColors.text,
+    tabIconDefault: brandColors.textLight,
+    tabIconSelected: brandColors.text,
+    tint: brandColors.text,
+    
+    // Primary
+    primary: brandColors.text,
+    secondary: brandColors.textLight,
   },
 };
 
+// ============================================
+// FONTES
+// ============================================
 export const Fonts = Platform.select({
   ios: {
     sans: 'system-ui',
@@ -62,7 +117,7 @@ export const Fonts = Platform.select({
     rounded: 'ui-rounded',
     mono: 'ui-monospace',
   },
-  default: {
+  android: {
     sans: 'normal',
     serif: 'serif',
     rounded: 'normal',
@@ -74,9 +129,17 @@ export const Fonts = Platform.select({
     rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
+  default: {
+    sans: 'normal',
+    serif: 'serif',
+    rounded: 'normal',
+    mono: 'monospace',
+  },
 });
 
-// Espaçamentos padronizados (escala de 4px)
+// ============================================
+// ESPAÇAMENTOS
+// ============================================
 export const Spacing = {
   xs: 4,
   sm: 8,
@@ -87,7 +150,9 @@ export const Spacing = {
   xxxl: 64,
 } as const;
 
-// Bordas padronizadas
+// ============================================
+// BORDAS
+// ============================================
 export const BorderRadius = {
   none: 0,
   sm: 4,
@@ -98,7 +163,9 @@ export const BorderRadius = {
   round: 9999,
 } as const;
 
-// Tipografia padronizada
+// ============================================
+// TIPOGRAFIA
+// ============================================
 export const Typography = {
   fontSize: {
     xs: 12,
@@ -127,37 +194,43 @@ export const Typography = {
   },
 } as const;
 
+// ============================================
+// SOMBRAS
+// ============================================
 export const getShadows = (isDark: boolean) => ({
   sm: {
-    shadowColor: isDark ? '#000000' : '#000000',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDark ? 0.3 : 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 1,
   },
   md: {
-    shadowColor: isDark ? '#000000' : '#000000',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: isDark ? 0.4 : 0.1,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
   },
   lg: {
-    shadowColor: isDark ? '#000000' : '#000000',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: isDark ? 0.5 : 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   xl: {
-    shadowColor: isDark ? '#000000' : '#000000',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: isDark ? 0.6 : 0.2,
+    shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 8,
   },
 });
 
+// ============================================
+// EXPORT
+// ============================================
 export const theme = {
   Colors,
   Fonts,
@@ -167,6 +240,9 @@ export const theme = {
   getShadows,
 } as const;
 
+// ============================================
+// TYPES
+// ============================================
 export type Theme = typeof theme;
 export type ColorsType = typeof Colors;
 export type SpacingType = typeof Spacing;

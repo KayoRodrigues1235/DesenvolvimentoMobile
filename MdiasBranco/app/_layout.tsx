@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
+import { useColorScheme } from '../hooks/use-color-scheme';
+import { Colors } from '../constants/theme';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -17,12 +17,8 @@ export default function RootLayout() {
           },
         }}
       >
-        <Stack.Screen 
-          name="index" 
-          options={{ 
-            title: 'Login',
-          }} 
-        />
+        <Stack.Screen name="index" />
+        <Stack.Screen name="tabs" options={{ headerShown: false }} />
       </Stack>
     </>
   );

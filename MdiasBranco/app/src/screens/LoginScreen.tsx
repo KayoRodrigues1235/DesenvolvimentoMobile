@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.display,
   },
   title: {
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.md,
   },
   subtitle: {
     fontSize: Typography.fontSize.md,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: Typography.fontSize.md,
     fontWeight: '600',
   },
