@@ -6,199 +6,294 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-// Tipos para os dados
-interface DashboardData {
-  totalPedidos: number;
-  pedidosPendentes: number;
-  pedidosEntregues: number;
-  visitasHoje: number;
-  metasMes: number;
-  progressoMeta: number;
-}
+// Componente do Gráfico de Pizza
+const DonutChart = ({ percentage, size = 100, strokeWidth = 12 }: { 
+  percentage: number; 
+  size?: number; 
+  strokeWidth?: number;
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  
+  // Cores profissionais para o gráfico
+  const chartColors = {
+    progress: '#4ade80',      // Verde vibrante para progresso
+    background: '#1e3a5f',    // Azul escuro para fundo
+    text: '#dce5e7',          // Branco para o texto
+  };
+
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size}>
+        <G rotation="-90" originX={size / 2} originY={size / 2}>
+          {/* Fundo do gráfico */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={chartColors.background}
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          {/* Progresso do gráfico */}
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={chartColors.progress}
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </G>
+        {/* Texto central */}
+        <SvgText
+          x={size / 2}
+          y={size / 2}
+          textAnchor="middle"
+          dy=".3em"
+          fill={chartColors.text}
+          fontSize={size * 0.2}
+          fontWeight="bold"
+        >
+          {`${percentage}%`}
+        </SvgText>
+      </Svg>
+    </View>
+  );
+};
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
-  const primaryColor = useThemeColor({}, 'primary');
+  
   const backgroundColor = useThemeColor({}, 'background');
   const surfaceColor = useThemeColor({}, 'surface');
   const textColor = useThemeColor({}, 'text');
   const textLightColor = useThemeColor({}, 'textLight');
+  const borderColor = useThemeColor({}, 'border');
 
-  // Dados simulados (depois virão da API)
-  const [dashboardData] = useState<DashboardData>({
+  // Dados simulados
+  const [dashboardData] = useState({
+    totalVendido: 32500,
+    porcentagemMeta: 65,
+    entregues: 133,
+    pendentes: 23,
     totalPedidos: 156,
-    pedidosPendentes: 23,
-    pedidosEntregues: 133,
-    visitasHoje: 8,
-    metasMes: 50000,
-    progressoMeta: 65,
   });
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Aqui vai buscar dados da API
     setTimeout(() => setRefreshing(false), 1500);
   };
 
-  // Formatar moeda
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
-
-  // Card de métrica
-  const MetricCard = ({ title, value, icon, color }: any) => (
-    <TouchableOpacity 
-      style={[styles.metricCard, { backgroundColor: surfaceColor }]}
-      activeOpacity={0.7}
-    >
-      <View style={styles.metricHeader}>
-        <ThemedText style={[styles.metricIcon, { color }]}>{icon}</ThemedText>
-        <ThemedText style={[styles.metricValue, { color }]}>{value}</ThemedText>
-      </View>
-      <ThemedText style={[styles.metricTitle, { color: textLightColor }]}>
-        {title}
-      </ThemedText>
-    </TouchableOpacity>
-  );
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor }]}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <ThemedView style={styles.content}>
-        {/* Cabeçalho com saudação */}
+        
+        {/* Header com Perfil e Notificações */}
         <View style={styles.header}>
-          <View>
-            <ThemedText style={styles.greeting}>Olá,</ThemedText>
-            <ThemedText type="title" style={[styles.userName, { color: primaryColor }]}>
-              João Silva
-            </ThemedText>
-            <ThemedText style={[styles.role, { color: textLightColor }]}>
-              Vendedor | Filial Fortaleza
-            </ThemedText>
-          </View>
           <TouchableOpacity 
-            style={[styles.avatar, { backgroundColor: primaryColor + '20' }]}
+            style={styles.headerButton}
             onPress={() => router.push('/src/tabs/perfil')}
           >
-            <ThemedText style={[styles.avatarText, { color: primaryColor }]}>
-              JS
-            </ThemedText>
+            <View style={[styles.avatar, { backgroundColor: textColor + '20' }]}>
+              <ThemedText style={[styles.avatarText, { color: textColor }]}>
+                JS
+              </ThemedText>
+            </View>
+            <View style={styles.headerInfo}>
+              <ThemedText style={styles.userName}>João Silva</ThemedText>
+              <ThemedText style={[styles.userRole, { color: textLightColor }]}>
+                Vendedor Pleno
+              </ThemedText>
+              <ThemedText style={[styles.userLocation, { color: textLightColor }]}>
+                Filial Fortaleza - CE
+              </ThemedText>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.notificationButton, { backgroundColor: surfaceColor }]}
+            onPress={() => router.push('/src/tabs/notificacoes')}
+          >
+            <Ionicons name="notifications-outline" size={24} color={textColor} />
+            <View style={[styles.notificationBadge, { backgroundColor: '#ef4444' }]}>
+              <ThemedText style={styles.badgeText}>2</ThemedText>
+            </View>
           </TouchableOpacity>
         </View>
 
-        {/* Métricas principais */}
-        <View style={styles.metricsGrid}>
-          <MetricCard
-            title="Total Pedidos"
-            value={dashboardData.totalPedidos}
-            icon="📦"
-            color={primaryColor}
-          />
-          <MetricCard
-            title="Pendentes"
-            value={dashboardData.pedidosPendentes}
-            icon="⏳"
-            color="#FFB81C"
-          />
-          <MetricCard
-            title="Entregues"
-            value={dashboardData.pedidosEntregues}
-            icon="✅"
-            color="#28A745"
-          />
-          <MetricCard
-            title="Visitas Hoje"
-            value={dashboardData.visitasHoje}
-            icon="🏪"
-            color="#17A2B8"
-          />
+        {/* Total Vendido */}
+        <View style={[styles.totalCard, { backgroundColor: surfaceColor }]}>
+          <ThemedText style={[styles.totalLabel, { color: textLightColor }]}>
+            Total Vendido
+          </ThemedText>
+          <ThemedText style={[styles.totalValue, { color: textColor }]}>
+            {formatCurrency(dashboardData.totalVendido)}
+          </ThemedText>
         </View>
 
-        {/* Progresso da Meta */}
-        <View style={[styles.goalCard, { backgroundColor: surfaceColor }]}>
-          <View style={styles.goalHeader}>
-            <ThemedText style={styles.goalTitle}>Meta do Mês</ThemedText>
-            <ThemedText type="subtitle" style={[styles.goalValue, { color: primaryColor }]}>
-              {formatCurrency(dashboardData.metasMes)}
+        {/* Cards lado a lado */}
+        <View style={styles.statsRow}>
+          {/* Card Meta com Gráfico Donut */}
+          <View style={[styles.statCard, { backgroundColor: surfaceColor }]}>
+            <ThemedText style={[styles.statTitle, { color: textLightColor }]}>
+              Meta do Mês
+            </ThemedText>
+            <DonutChart percentage={dashboardData.porcentagemMeta} size={100} />
+            <ThemedText style={[styles.statSubtext, { color: textLightColor }]}>
+              {dashboardData.porcentagemMeta}% atingido
             </ThemedText>
           </View>
-          <View style={styles.progressBarContainer}>
-            <View 
-              style={[
-                styles.progressBar, 
-                { width: `${dashboardData.progressoMeta}%`, backgroundColor: primaryColor }
-              ]} 
-            />
-          </View>
-          <View style={styles.progressLabels}>
-            <ThemedText style={[styles.progressText, { color: textLightColor }]}>
-              Progresso: {dashboardData.progressoMeta}%
+
+          {/* Card Entregas */}
+          <View style={[styles.statCard, { backgroundColor: surfaceColor }]}>
+            <ThemedText style={[styles.statTitle, { color: textLightColor }]}>
+              Entregas
             </ThemedText>
-            <ThemedText style={[styles.progressText, { color: textLightColor }]}>
-              Faltam {formatCurrency(dashboardData.metasMes * (1 - dashboardData.progressoMeta / 100))}
-            </ThemedText>
+            
+            <View style={styles.deliveryStats}>
+              <View style={styles.deliveryItem}>
+                <View style={[styles.deliveryDot, { backgroundColor: '#4ade80' }]} />
+                <View>
+                  <ThemedText style={[styles.deliveryNumber, { color: textColor }]}>
+                    {dashboardData.entregues}
+                  </ThemedText>
+                  <ThemedText style={[styles.deliveryLabel, { color: textLightColor }]}>
+                    Entregues
+                  </ThemedText>
+                </View>
+              </View>
+              
+              <View style={styles.deliveryDivider} />
+              
+              <View style={styles.deliveryItem}>
+                <View style={[styles.deliveryDot, { backgroundColor: '#f97316' }]} />
+                <View>
+                  <ThemedText style={[styles.deliveryNumber, { color: textColor }]}>
+                    {dashboardData.pendentes}
+                  </ThemedText>
+                  <ThemedText style={[styles.deliveryLabel, { color: textLightColor }]}>
+                    Pendentes
+                  </ThemedText>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.totalPedidos}>
+              <ThemedText style={[styles.totalPedidosLabel, { color: textLightColor }]}>
+                Total de Pedidos
+              </ThemedText>
+              <ThemedText style={[styles.totalPedidosValue, { color: textColor }]}>
+                {dashboardData.totalPedidos}
+              </ThemedText>
+            </View>
           </View>
         </View>
 
-        {/* Ações rápidas */}
-        <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Ações Rápidas
-        </ThemedText>
-        <View style={styles.quickActions}>
+        {/* Ações Rápidas */}
+        <View style={styles.actionsSection}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Ações Rápidas
+          </ThemedText>
+          
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: surfaceColor }]}
             onPress={() => router.push('/src/tabs/pedidos')}
           >
-            <ThemedText style={[styles.actionIcon, { color: primaryColor }]}>
-              📝
-            </ThemedText>
-            <ThemedText style={styles.actionText}>Novo Pedido</ThemedText>
+            <View style={styles.actionLeft}>
+              <View style={[styles.actionIconBg, { backgroundColor: textColor + '15' }]}>
+                <Ionicons name="add-circle-outline" size={24} color={textColor} />
+              </View>
+              <View>
+                <ThemedText style={styles.actionTitle}>Novo Pedido</ThemedText>
+                <ThemedText style={[styles.actionSubtitle, { color: textLightColor }]}>
+                  Registrar nova venda
+                </ThemedText>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={textLightColor} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: surfaceColor }]}
             onPress={() => {}}
           >
-            <ThemedText style={[styles.actionIcon, { color: primaryColor }]}>
-              📊
-            </ThemedText>
-            <ThemedText style={styles.actionText}>Relatórios</ThemedText>
+            <View style={styles.actionLeft}>
+              <View style={[styles.actionIconBg, { backgroundColor: textColor + '15' }]}>
+                <Ionicons name="bar-chart-outline" size={24} color={textColor} />
+              </View>
+              <View>
+                <ThemedText style={styles.actionTitle}>Relatórios</ThemedText>
+                <ThemedText style={[styles.actionSubtitle, { color: textLightColor }]}>
+                  Acompanhar resultados
+                </ThemedText>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={textLightColor} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: surfaceColor }]}
             onPress={() => {}}
           >
-            <ThemedText style={[styles.actionIcon, { color: primaryColor }]}>
-              🎯
-            </ThemedText>
-            <ThemedText style={styles.actionText}>Metas</ThemedText>
+            <View style={styles.actionLeft}>
+              <View style={[styles.actionIconBg, { backgroundColor: textColor + '15' }]}>
+                <Ionicons name="flag-outline" size={24} color={textColor} />
+              </View>
+              <View>
+                <ThemedText style={styles.actionTitle}>Minhas Metas</ThemedText>
+                <ThemedText style={[styles.actionSubtitle, { color: textLightColor }]}>
+                  Ver metas do período
+                </ThemedText>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={textLightColor} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: surfaceColor }]}
             onPress={() => router.push('/src/tabs/notificacoes')}
           >
-            <ThemedText style={[styles.actionIcon, { color: primaryColor }]}>
-              🔔
-            </ThemedText>
-            <ThemedText style={styles.actionText}>Comunicados</ThemedText>
+            <View style={styles.actionLeft}>
+              <View style={[styles.actionIconBg, { backgroundColor: textColor + '15' }]}>
+                <Ionicons name="megaphone-outline" size={24} color={textColor} />
+              </View>
+              <View>
+                <ThemedText style={styles.actionTitle}>Comunicados</ThemedText>
+                <ThemedText style={[styles.actionSubtitle, { color: textLightColor }]}>
+                  Avisos importantes
+                </ThemedText>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={textLightColor} />
           </TouchableOpacity>
         </View>
+
       </ThemedView>
     </ScrollView>
   );
@@ -210,25 +305,20 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
   },
+  
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: Spacing.xl,
   },
-  greeting: {
-    fontSize: Typography.fontSize.md,
-    marginBottom: Spacing.xs,
-  },
-  userName: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    marginBottom: Spacing.xs,
-  },
-  role: {
-    fontSize: Typography.fontSize.sm,
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   avatar: {
     width: 50,
@@ -236,96 +326,169 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: Spacing.md,
   },
   avatarText: {
     fontSize: Typography.fontSize.lg,
     fontWeight: Typography.fontWeight.bold,
   },
-  metricsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.xl,
+  headerInfo: {
+    flex: 1,
   },
-  metricCard: {
-    width: '48%',
-    padding: Spacing.md,
+  userName: {
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.bold,
+    marginBottom: 2,
+  },
+  userRole: {
+    fontSize: Typography.fontSize.xs,
+    marginBottom: 2,
+  },
+  userLocation: {
+    fontSize: Typography.fontSize.xs,
+  },
+  notificationButton: {
+    width: 50,
+    height: 50,
     borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.md,
-  },
-  metricHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    position: 'relative',
   },
-  metricIcon: {
-    fontSize: Typography.fontSize.xxl,
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 20,
+    height: 20,
+    borderRadius: BorderRadius.round,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
   },
-  metricValue: {
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+
+  totalCard: {
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.xl,
+    marginBottom: Spacing.lg,
+    alignItems: 'center',
+  },
+  totalLabel: {
+    fontSize: Typography.fontSize.sm,
+    marginBottom: Spacing.xs,
+  },
+  totalValue: {
     fontSize: Typography.fontSize.xxl,
     fontWeight: Typography.fontWeight.bold,
   },
-  metricTitle: {
-    fontSize: Typography.fontSize.sm,
-  },
-  goalCard: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.xl,
-  },
-  goalHeader: {
+
+  statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
+  },
+  statCard: {
+    flex: 1,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.xl,
     alignItems: 'center',
+  },
+  statTitle: {
+    fontSize: Typography.fontSize.xs,
+    marginBottom: Spacing.md,
+    textAlign: 'center',
+  },
+  statSubtext: {
+    fontSize: Typography.fontSize.xs,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+  },
+
+  deliveryStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
     marginBottom: Spacing.md,
   },
-  goalTitle: {
-    fontSize: Typography.fontSize.md,
+  deliveryItem: {
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
-  goalValue: {
+  deliveryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginBottom: Spacing.xs,
+  },
+  deliveryNumber: {
     fontSize: Typography.fontSize.xl,
     fontWeight: Typography.fontWeight.bold,
+    textAlign: 'center',
   },
-  progressBarContainer: {
-    height: 8,
+  deliveryLabel: {
+    fontSize: Typography.fontSize.xs,
+    textAlign: 'center',
+  },
+  deliveryDivider: {
+    width: 1,
     backgroundColor: '#124192',
-    borderRadius: BorderRadius.sm,
-    overflow: 'hidden',
-    marginBottom: Spacing.sm,
   },
-  progressBar: {
-    height: '100%',
-    borderRadius: BorderRadius.sm,
-  },
-  progressLabels: {
+  totalPedidos: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%',
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: '#124192',
+    marginTop: Spacing.sm,
   },
-  progressText: {
-    fontSize: Typography.fontSize.xs,
+  totalPedidosLabel: {
+    fontSize: Typography.fontSize.sm,
+  },
+  totalPedidosValue: {
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.bold,
+  },
+
+  actionsSection: {
+    marginBottom: Spacing.xl,
   },
   sectionTitle: {
     marginBottom: Spacing.md,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    fontSize: Typography.fontSize.lg,
   },
   actionButton: {
-    width: '48%',
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  actionIcon: {
-    fontSize: Typography.fontSize.xxxl,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
     marginBottom: Spacing.sm,
   },
-  actionText: {
-    fontSize: Typography.fontSize.sm,
-    textAlign: 'center',
+  actionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  actionIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionTitle: {
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: Typography.fontSize.xs,
   },
 });

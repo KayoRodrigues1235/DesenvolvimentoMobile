@@ -1,35 +1,58 @@
 import { Tabs } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { HapticTab } from '@/components/haptic-tab';
+import { Ionicons } from '@expo/vector-icons';
+import { Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+function TabBarIcon({ focused, color, name }: { focused: boolean; color: string; name: any }) {
+  return (
+    <Ionicons
+      name={focused ? name : `${name}-outline`}
+      size={24}
+      color={color}
+    />
+  );
+}
 
 export default function TabLayout() {
-  const primaryColor = useThemeColor({}, 'primary');
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const textLightColor = useThemeColor({}, 'textLight');
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: primaryColor,
+        tabBarActiveTintColor: textColor,
         tabBarInactiveTintColor: textLightColor,
         tabBarStyle: {
-          backgroundColor,
+          backgroundColor: backgroundColor,
           borderTopColor: textLightColor + '20',
+          borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 70 + insets.bottom : 120,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 10,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+          marginTop: 4,
         },
         headerStyle: {
-          backgroundColor,
+          backgroundColor: backgroundColor,
         },
         headerTintColor: textColor,
-        tabBarButton: HapticTab,
-      }}>
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{
           title: 'Início',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={24} name="house.fill" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon focused={focused} color={color} name="home" />
           ),
         }}
       />
@@ -37,8 +60,8 @@ export default function TabLayout() {
         name="pedidos"
         options={{
           title: 'Pedidos',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={24} name="shippingbox.fill" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon focused={focused} color={color} name="cart" />
           ),
         }}
       />
@@ -46,8 +69,8 @@ export default function TabLayout() {
         name="notificacoes"
         options={{
           title: 'Notificações',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={24} name="bell.fill" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon focused={focused} color={color} name="notifications" />
           ),
         }}
       />
@@ -55,8 +78,8 @@ export default function TabLayout() {
         name="perfil"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={24} name="person.fill" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon focused={focused} color={color} name="person" />
           ),
         }}
       />
